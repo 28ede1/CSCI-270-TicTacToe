@@ -2,31 +2,6 @@ from players import *
 from tictactoe import *
 from ttutil import *
 
-"""
-given some player (1 or 2)
-
-have 1 function check for row win condition
-
-have 1 function check for col win condition
-
-have 1 function check for diagonal win condition
-
-return True/False
-
-
-for the main function:
-
-have one variable store result of the checking all 3 for player 1 (p1_won?)
-have another variable store result of checking all 3 for player 1 (p2_won?)
-
-
-if p1_won return 1
-if p2_won return 2
-if two winners 
-return exception 
-
-"""
-
 def test_check_row_win():
     board_1 = [1, 1, 1, 0, 2, 0, 2, 0, 0]
     board_2 = [2, 0, 0, 1, 1, 1, 0, 2, 0]
