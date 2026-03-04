@@ -1,5 +1,5 @@
 from ttutil import print_board
-from players import random_player_fn
+from players import random_player_fn, create_optimal_player_fn
 
 def check_row_win(player, board):
     left = 0
@@ -121,9 +121,71 @@ def play_tournament(num_rounds, player1_fn, player2_fn):
 
 
 def compile_playbook():
-    raise NotImplementedError("Fill this in!")
+    """
+    'maximizer' stores which player is currently maximizing
+    'current_turn' stores whose turn it currently is
+    'playerbook' is a dictionary that (based on current board state key) stores a list of best moves to make
+    """
+    def minimax(board, maximizer, current_turn, move_playbook):
+        winner = check_win_conditions(board)
+        best_moves = []
 
+        
+        if winner != 0:
+            if maximizer == winner:
+                minimax_value = 1
+            else:
+                minimax_value = -1
 
+        elif board_is_filled(board):
+            minimax_value = 0
+
+        else:
+            next_player = 1 if current_turn != 1 else 2
+            minimax_value = float("-inf") if maximizer == current_turn else float("inf")
+
+            for i in range(len(board)):
+                if board[i] == 0:
+                    
+                    board[i] = current_turn
+                    possible_move_final_outcome = minimax(board, maximizer, next_player, move_playbook)
+
+                    if maximizer == current_turn:
+                        if possible_move_final_outcome > minimax_value:
+                            best_moves = [i]
+                            minimax_value = possible_move_final_outcome
+                        elif possible_move_final_outcome == minimax_value:
+                            best_moves.append(i)
+                            minimax_value = possible_move_final_outcome
+
+                    else:
+                        if possible_move_final_outcome < minimax_value:
+                            best_moves = [i]
+                            minimax_value = possible_move_final_outcome
+                        elif possible_move_final_outcome == minimax_value:
+                            best_moves.append(i)
+                            minimax_value = possible_move_final_outcome
+                    
+                    board[i] = 0
+        move_playbook[tuple(board)] = best_moves
+
+        return minimax_value
+    new_playbook = {}
+    minimax([0,0,0,0,0,0,0,0,0], 1, 1, new_playbook)
+    return new_playbook
+    
 if __name__ == "__main__":
-    game = play_game(random_player_fn, random_player_fn)
-    report_game(game)
+    # game = play_game(random_player_fn, random_player_fn)
+    # report_game(game)
+
+
+    # playbook = compile_playbook()
+    # test = playbook[(0, 0, 0, 0, 1, 0, 0, 0, 0)]
+    # print(test)
+
+
+    playbook = compile_playbook()
+
+    player1 = create_optimal_player_fn(playbook)
+    player2 = create_optimal_player_fn(playbook)
+    play_tournament(100, player1, player2)
